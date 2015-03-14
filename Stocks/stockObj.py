@@ -20,6 +20,6 @@ class Equity:
     def __str__(self):
         exspace = '\t' if len(str(self.price)) >= 7 else ''
         netprice = self.shares * self.price
-        print 'Trade/Ticker', '\t', 'Price', '\t' + exspace, 'Shares', '\t', 'Net Value'
+        print 'Ticker', '\t', 'Price', '\t' + exspace, 'Shares', '\t', 'Net Value'
         print self.ticker, '\t', self.price, '\t', self.shares, '\t', netprice
         return ''
