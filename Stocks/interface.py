@@ -1,92 +1,127 @@
-#url google_finance >>> python EQUITY created by Ritwik Dixit 11/3/13
-
-# Instructions if you are running this
-# copy paste the url in GOOGLE FINANCE ONLY of the desired stock
+#Equity Stocks Game created by Ritwik Dixit on 11/3/13
+#Rewritten/Optimized on 3/13/15
 
 #To anyone reading this after Summer 2014:
-#This function was made a long time ago
 #Please do not mind that I had no idea how to handle HTTP requests :P
-#Please do not mind the funny code style, I was still learning Python
-#and Object Oriented Concepts at the time
 
-#Usage: type the name of your stock into google
-#Click on the stock, in the url, get the cid value and paste it in here.
-#i.e. google search 'GOOG', click stock, cid = 304466804484872
+#Usage: type the name of your stock when buying
+#Sample buy stock input: 'GOOGL' (no quotes)
+#Sample buy stock input: 'BRK.A' (no quotes)
+#To Sell, or get report, there are instructions
 
-from geturlpriceFUNCTION import *
+from addStockScript import *
+from stockObj import *
+from file_io import *
 
-class Equity:
+#global variables
+cash = 0.0
+objs = []
+startCash = 1000000
 
-    #data = price, shares, ticker, (g)id
-    
-    def __init__(self, price, shares, ticker, gid):
-        self.price = float(price)
-        self.shares = int(shares)
-        self.ticker = ticker
-        self.gid = gid
+#gets the real time value of the stocks, updates your holdings
+def updateStocks():
+    print 'Getting Real Time Data, Please Wait...'
+    global objs
+    #get new val for all stocks
+    for i in range(len(objs)):
+        stock = objs[i]
+        newStock = Equity(getStockReport(stock)[1], stock.shares, stock.ticker, stock.gid)
+        objs[i] = newStock
 
-    def back(self):
-        netval = self.price * self.shares
-        allstock = [self.price, self.shares, self.ticker, netval]
-        return allstock
+def reset():
+    global cash
+    global objs
+    reset = open('data.txt', 'w')
+    reset.write(str(startCash) + '\n')
+    reset.close()
+    cash = float(startCash)
+    objs = []
 
-    def __str__(self):
-        netprice = self.shares * self.price
-        print "Trade & Ticker", "\t", "Price", "\t", "Shares", "\t", "Net Value"
-        print self.ticker, "\t", self.price, "\t", self.shares, "\t", netprice
-        return ''
-
-def saveToFile(obj):
-    writeData = open('data.txt', 'a')
-    data = str(obj.price) + '-&-' + str(obj.shares) + '-&-'
-    data += str(obj.ticker) + '-&-' + str(obj.gid)
-    writeData.write(data + '\n')
-
-#gets old data and sees how much the stock has changed value
-def getStockReport(stock):
-    url = 'https://www.google.com/finance?cid=' + stock.gid
-    newprice = float(get_stock_price(url))
-    change = newprice - stock.price
-    return ('This stock has changed by: ' + str(change), change)
-
-
-def readDataFromFile():
-    f = open('data.txt', 'r')
-    content = f.readlines()
-    content = [line.strip('\n') for line in content]
-    objects = []
-    #parse to objects
-    for val in content:
-        data = val.split('-&-')
-        objects.append(Equity(data[0], data[1], data[2], data[3]))
-    return objects
-
+#Enter ticker, shares
+#Gets the stock from google finance, adds to holdings
 def buyStock():
-    stockid = raw_input('enter the google finance cid no spaces: ')
+    global cash
+    global objs    
+    trade_ticker = raw_input('Enter the ticker, i.e. \'GOOGL\': ')
     tshares = raw_input('how many shares would you like to order: ')
 
-    stockurl = 'https://www.google.com/finance?cid=' + stockid
-    tprice = get_stock_price(stockurl)
-    trade_ticker = get_ticker(stockurl)
+    data = []
+    try:
+        data = getStockData(trade_ticker)
+    except:
+        print 'Error in finding Stock'
+        return 0
+
+    stockid = data[0]
+    tprice = data[1]
 
     stock1 = Equity(tprice, tshares, trade_ticker, stockid)
-    print '\nTRANSACTION COMPLETED\n'
-    print stock1
-    saveToFile(stock1)
-    return stock1
+    if stock1.getNetValue() <= cash:
+        objs.append(stock1)
+        cash -= stock1.getNetValue()
+        saveToFile(objs, str(cash))
+        print '\nTRANSACTION COMPLETED\n' + str(stock1)
+    else:
+        print 'You don\'t have enough money!'
 
+#allows you to 'pop' some of your stocks and sell them for cash
+def sellStocks():
+    global cash
+    global objs
+    updateStocks()
+    if len(objs) < 1:
+        print 'No Stocks to Sell'
+        return 0
+    global cash
+    print 'Enter the index for the stock you would like to sell:'
+    for i in range(len(objs)):
+        print '[' + str(i) + '] '
+        print str(objs[i]) + '\n'
+    choice = int(raw_input('>> '))
+    try:
+        stockToSell = objs.pop(choice)
+        cash += stockToSell.getNetValue()
+        saveToFile(objs, str(cash))
+        print '\nTRANSACTION COMPLETED\n'
+    except:
+        print 'Stock Sell Error'
 
-objs = readDataFromFile()
-for stoc in objs:
-    print stoc
-    print getStockReport(stoc)[0]
-choice = raw_input('1 to buy more objects, 2 to quit >>')
-while choice != '2':
-    if choice == '1':
+#Prints out a Portfolio Holdings Report
+def getFullReport():
+    updateStocks()    
+    print 'Cash = $' + str(cash) + '\n'
+    total = 0
+    for stoc in objs:
+        total += stoc.getNetValue()
+        print str(stoc) + getStockReport(stoc)[0] + '\n'
+    total += cash
+    print 'Your total net worth = $' + str(total)
+
+saved = readDataFromFile()
+cash = float(saved[0])
+objs = saved[1]
+updateStocks()
+
+#The Console Application Menu
+print '\n-------Equity Stocks Game Menu-------'
+print '>1 to buy stocks \n>2 to sell stocks \n>3 for report\n>4 to quit\n>0 to reset game'
+choice = raw_input('>>')
+while choice != '4':
+    if choice == '0':
+        c = raw_input('are you sure you want to reset? Y for Yes >>')
+        if c == 'y' or c == 'Y':
+            reset()
+            print 'Game reset.'
+        else: 
+            print 'Game not reset.'
+    elif choice == '1':
         buyStock()
-    choice = raw_input('1 to buy more objects, 2 to quit >>')
+    elif choice == '2':
+        sellStocks()
+    elif choice == '3':
+        getFullReport()
 
+    print '\n-------Equity Stocks Game Menu-------'
+    print '>1 to buy stocks \n>2 to sell stocks \n>3 for report\n>4 to quit\n>0 to reset game'
+    choice = raw_input('>>')
 
-
-
-    
