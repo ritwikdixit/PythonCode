@@ -77,12 +77,14 @@ def sellStocks():
     for i in range(len(objs)):
         print '[' + str(i) + '] '
         print str(objs[i]) + '\n'
-    choice = int(raw_input('>> '))
+    choiceStr = raw_input('>> ')
     try:
+        choice = int(choiceStr)
         stockToSell = objs.pop(choice)
         cash += stockToSell.getNetValue()
         saveToFile(objs, str(cash))
-        print '\nTRANSACTION COMPLETED\n'
+        print '\nTRANSACTION COMPLETED\n Stock Sold:'
+        print stockToSell
     except:
         print 'Stock Sell Error'
 
