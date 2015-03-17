@@ -11,6 +11,11 @@ def get_price_from_source_id(info, gid):
     stock_price = info[startIndex : info.find('<',startIndex)].replace(',', '')
     return stock_price
 
+#format so -$100 or +$100
+def cashFormat(floatnum):
+    string = '+$' + str(floatnum) if floatnum >= 0 else '-$' + str(floatnum)[1:]
+    return string
+
 #usage: tick should be market:stock ticker, i.e.
 #tick = 'NYSE:GE'
 #tick = 'NASDAQ:TSLA'
@@ -21,7 +26,7 @@ def getStockData(tick):
     info = source.read()
     #find the cid
     tag = '<link rel=\"canonical\" href=\"'
-    
+
     startSearchIndex = info.find(tag) + len(tag)
     gidIndex = info.find('=', startSearchIndex) + 1
     gid = info[gidIndex:info.find('\">', gidIndex)]
@@ -34,4 +39,4 @@ def getStockReport(stock):
     info = urllib.urlopen('https://www.google.com/finance?cid=' + stock.gid).read()
     newprice = float(get_price_from_source_id(info, stock.gid))
     change = newprice - stock.price
-    return ('This stock has changed by: $' + str(change), newprice)
+    return ('change since buy: ' + cashFormat(change) + ' net gain: ' + cashFormat(change*stock.shares), newprice)
