@@ -13,16 +13,10 @@
 from fractions import Fraction
 
 def findDivisors(n):
-    divisors = []
-    for i in range(1, n - 1):
-        if n % i == 0:
-            divisors.append(i)
-    return divisors
+    return [i for i in range(1, n - 1) if n % i == 0]
 
 def isEvenPerfectSquare(n):
-    if (n ** 0.5).is_integer() and n % 2 == 0:
-        return True
-    return False
+    return (n ** 0.5).is_integer() and n % 2 == 0
 
 #num of inputs
 n = int(raw_input())
