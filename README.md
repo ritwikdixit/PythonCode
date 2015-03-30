@@ -12,6 +12,10 @@ Note: Data is saved in a text file, cheating is very easy as anyone
 can manipulate the data by changing the text. Game was not designed for 
 production.
 
+itunes scrape  
+python script to scrape data of the top 100 free apps on itunes store and store in text file:  
+app name, category, size, seller, ratings
+
 PRA8 & PRA12:
 
 Algorithms, Descriptions are written as a comment in the file.
