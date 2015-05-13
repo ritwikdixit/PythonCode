@@ -1,9 +1,9 @@
 Some small Python Projects.
 
-Skier
+Skier  
 An arcade game made with PyGame. Avoid the trees, use arrow keys to turn!
 
-Stocks
+Stocks  
 My Stock Market Simulation Game. Users start off with $1 million
 and can buy/sell stocks from the application. No APIs used, application
 scrapes real time stock data from Google Finance. Rudimentary HTML parsing used
@@ -16,6 +16,3 @@ itunes scrape
 python script to scrape data of the top 100 free apps on itunes store and store in text file:  
 app name, category, size, seller, ratings
 
-PRA8 & PRA12:
-
-Algorithms, Descriptions are written as a comment in the file.
