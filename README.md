@@ -12,6 +12,11 @@ Note: Data is saved in a text file, cheating is very easy as anyone
 can manipulate the data by changing the text. Game was not designed for 
 production.
 
+autograder  
+local usaco style file I/O C++ compiler and problem autograder. see script for more details.  
+Note: local cmd line, unix only  
+Example usage for provided data: python cmdrun.py task1
+
 itunes scrape  
 python script to scrape data of the top 100 free apps on itunes store and store in text file:  
 app name, category, size, seller, ratings
