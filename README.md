@@ -14,7 +14,7 @@ production.
 
 autograder  
 local usaco style file I/O C++ compiler and problem autograder. see script for more details.  
-Note: local cmd line, unix only  
+Note: Only works with unix gcc/g++, local cmd line program
 Example usage for provided data: python cmdrun.py task1
 
 itunes scrape  
